@@ -1,6 +1,7 @@
 # Cowboy
 
+Install dependencies with
 ```
-Install dependencies with npm install
+npm install
 ```
 Look at package json for commands to run program.
