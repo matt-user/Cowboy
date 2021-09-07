@@ -9,7 +9,7 @@ fs.removeSync(buildPath);
 
 // Compile the solidity contract file and output the abi
 const contractFolder = 'contracts';
-const contractName = 'Battle.sol';
+const contractName = 'BattleHandler.sol';
 const contractPath = path.resolve(__dirname, contractFolder, contractName);
 const source = fs.readFileSync(contractPath, 'utf-8');
 const input = {
