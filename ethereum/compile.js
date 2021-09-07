@@ -15,7 +15,7 @@ const source = fs.readFileSync(contractPath, 'utf-8');
 const input = {
     language: "Solidity",
     sources: {
-        contractName: {
+        [contractName]: {
             content: source,
         },
     },
