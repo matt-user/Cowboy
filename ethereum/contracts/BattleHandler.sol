@@ -32,6 +32,10 @@ contract BattleHandler {
         return battle.winner;
     }
 
+    function getBattle() public view returns(Battle memory) {
+        return battle;
+    }
+
     function takeTurn(uint command, uint cowboyId) public {
         require(!battle.gameOver, "The game is over your cowboy can't take turns.");
         Cowboy storage cowboy;
