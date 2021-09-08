@@ -85,20 +85,21 @@ describe('Battle Handler', () => {
         // Command cowboy 0 to shoot and 1 to reload
         await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
         await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
-        let battle = await battleHandler.methods.getBattle(0).call();
+        const battle = await battleHandler.methods.getBattle(0).call();
         battleStateHelper(battle, true, "uno", "0");
-        let winner = await battleHandler.methods.getWinner(0).call();
+        const winner = await battleHandler.methods.getWinner(0).call();
         assert.strictEqual(winner, "uno", "getWinner should return uno");
     });
 
     it('Allows cowboys to dodge shots', async () => {
-        // Command cowboy 1 and 2 to reload
-        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
-        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
-        // Command cowboy 1 to shoot and 2 to dodge
-        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
-        await battleHandler.methods.takeTurn(2, 2).send(sendProps);
-        let battle = await battleHandler.methods.getBattle().call();
+        await createTestBattle();
+        // Command cowboy 0 and 1 to reload
+        await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
+        // Command cowboy 0 to shoot and 1 to dodge
+        await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
+        await battleHandler.methods.takeTurn(2, 1, 0).send(sendProps);
+        const battle = await battleHandler.methods.getBattle(0).call();
         battleStateHelper(battle, false, "", "0")
     });
 
