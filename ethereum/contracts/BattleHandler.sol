@@ -34,16 +34,16 @@ contract BattleHandler {
         return battle.winner;
     }
 
-    function getBattle() public view returns(Battle memory) {
-        return battle;
+    function getBattle(uint battleId) public view returns(Battle memory) {
+        return battleList[battleId];
     }
 
     function createNewCowboy(string memory _name) public {
         cowboyList.push(Cowboy(_name, 0, false, false, false));
     }
 
-    function createBattle() public {
-
+    function createBattle(uint cowboyId1, uint cowboyId2) public {
+        battleList.push(Battle(cowboyList[cowboyId1], cowboyList[cowboyId2], "", 0, false));
     }
 
     function takeTurn(uint command, uint cowboyId) public {
