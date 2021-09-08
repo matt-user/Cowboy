@@ -129,14 +129,15 @@ describe('Battle Handler', () => {
     });
 
     it('Requires game to be not over for cowboys to take turns', async () => {
-        // Command cowboy 1 and 2 to reload
-        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
-        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
-        // Command cowboy 1 to shoot and 2 to reload
-        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
-        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
+        await createTestBattle();
+        // Command cowboy 0 and 1 to reload
+        await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
+        // Command cowboy 0 to shoot and 1 to reload
+        await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
         try {
-            await battleHandler.methods.takeTurn(0, 1).send(sendProps);
+            await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
             assert(false);
         } catch (err) {
             assert(err);
