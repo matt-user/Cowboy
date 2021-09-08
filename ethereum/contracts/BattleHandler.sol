@@ -19,7 +19,9 @@ contract BattleHandler {
         bool shooting;
     }
 
-    Battle battle;
+    Battle[] private battleList;
+    Cowboy[] private cowboyList;
+    Battle private battle;
 
     constructor() {
         Cowboy memory cowboy1 = Cowboy("uno", 0, false, false, false);
@@ -34,6 +36,14 @@ contract BattleHandler {
 
     function getBattle() public view returns(Battle memory) {
         return battle;
+    }
+
+    function createNewCowboy(string memory _name) public {
+        cowboyList.push(Cowboy(_name, 0, false, false, false));
+    }
+
+    function createBattle() public {
+
     }
 
     function takeTurn(uint command, uint cowboyId) public {
