@@ -27,6 +27,22 @@ contract BattleHandler {
     constructor() {}
 
     /**
+    * @dev requires the given cowboy id is within bounds
+     */
+    modifier cowboyIdInBounds(uint cowboyId) {
+        require(cowboyId < cowboyList.length, "Given cowboy id out of bounds");
+        _;
+    }
+
+    /**
+    * @dev requires the given battle id is within bounds
+     */
+     modifier battleIdInBounds(uint battleId) {
+         require(battleId < battleList.length, "Given battle id out of bounds");
+         _;
+     }
+
+    /**
     * @dev returns the winning name if the battle is over
     * @param battleId id of the battle to get the winner
     * @return returns the name of the winner of the battle
@@ -42,8 +58,7 @@ contract BattleHandler {
     * @param battleId id of the battle to return
     * @return the battle of the given id
     **/
-    function getBattle(uint battleId) public view returns(Battle memory) {
-        require(battleId < battleList.length, "battle Id out of bounds");
+    function getBattle(uint battleId) public battleIdInBountds(battleId) view returns(Battle memory) {
         return battleList[battleId];
     }
 
@@ -52,8 +67,7 @@ contract BattleHandler {
     * @param cowboyId id of the cowboy to return
     * @return the cowboy of the given id
      */
-     function getCowboy(uint cowboyId) public view returns(Cowboy memory) {
-         require(cowboyId < cowboyList.length, "cowboy id out of bounds");
+     function getCowboy(uint cowboyId) public cowboyIdInBounds(cowboyId) view returns(Cowboy memory) {
          return cowboyList[cowboyId];
      }
 
@@ -70,7 +84,7 @@ contract BattleHandler {
     * @param cowboyId1 id of cowboy1
     * @param cowboyId2 id of cowboy2
      */
-    function createBattle(uint cowboyId1, uint cowboyId2) public {
+    function createBattle(uint cowboyId1, uint cowboyId2) public cowboyIdInBounds(cowboyId1) cowboyIdInBounds(cowboyId2) {
         battleList.push(Battle(cowboyId1, cowboyId2, "", 0, false));
     }
 
@@ -80,7 +94,7 @@ contract BattleHandler {
     * @param cowboyId specifies which cowboy to command
     * @param battleId specifies the battle for this turn
     */
-    function takeTurn(uint command, uint cowboyId, uint battleId) public {
+    function takeTurn(uint command, uint cowboyId, uint battleId) public cowboyIdInBounds(cowboyId) battleIdInBounds(battleId) {
         Battle storage battle = battleList[battleId];
         require(!battle.gameOver, "The game is over your cowboy can't take turns.");
         require(cowboyId == battle.cowboyId0 || cowboyId == battle.cowboyId1, "The given cowboy is not in the given battle");
