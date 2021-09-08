@@ -58,7 +58,7 @@ contract BattleHandler {
     * @param battleId id of the battle to return
     * @return the battle of the given id
     **/
-    function getBattle(uint battleId) public battleIdInBountds(battleId) view returns(Battle memory) {
+    function getBattle(uint battleId) public battleIdInBounds(battleId) view returns(Battle memory) {
         return battleList[battleId];
     }
 

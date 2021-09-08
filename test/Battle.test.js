@@ -27,8 +27,7 @@ describe('Battle Handler', () => {
     });
 
     it('correctly creates new cowboys', async () => {
-        await battleHandler.methods.createCowboy("uno").send(sendProps);
-        await battleHandler.methods.createCowboy("dos").send(sendProps);
+        await createTestCowboys();
         const cowboy0 = await battleHandler.methods.getCowboy(0).call();
         const cowboy1 = await battleHandler.methods.getCowboy(1).call();
         cowboyStateHelper(cowboy0, "0", false, false);
@@ -36,17 +35,18 @@ describe('Battle Handler', () => {
     });
 
     it('correctly creates new battles', async () => {
-        await battleHandler.methods.createCowboy("uno").send(sendProps);
-        await battleHandler.methods.createCowboy("dos").send(sendProps);
-        await battleHandler.methods.createBattle(0, 1).send(sendProps);
-        const battle = await battleHandler.methods.getBattle(0).call();
+        // await battleHandler.methods.createCowboy("uno").send(sendProps);
+        // await battleHandler.methods.createCowboy("dos").send(sendProps);
+        // await battleHandler.methods.createBattle(0, 1).send(sendProps);
+        // const battle = await battleHandler.methods.getBattle(0).call();
+        const battle = await createTestBattle();
         battleStateHelper(battle, false, "", "0")
     });
 
     it('Correctly reloads for the cowboy', async () => {
         // Command cowboy1 to reload
-        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
-        const battle = await battleHandler.methods.getBattle().call();
+        await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
+        const battle = await battleHandler.methods.getBattle(0).call();
         cowboyStateHelper(battle.cowboy1, "1", false, true);
     });
 
@@ -165,3 +165,18 @@ function battleStateHelper(battle, gameOverShouldBe, winnerShouldBe, turnCounter
     assert.strictEqual(battle.turnCounter, turnCounterShouldBe, `battle.turnCounter should be ${turnCounterShouldBe}`);
 }
 
+/** Creates a default battle for testing
+ * @return {Object} the battle we created
+ */
+async function createTestBattle() {
+    await createTestCowboys();
+    await battleHandler.methods.createBattle(0, 1).send(sendProps);
+    return await battleHandler.methods.getBattle(0).call();
+}
+
+/** Creates default cowboys for testing
+ */
+async function createTestCowboys() {
+    await battleHandler.methods.createCowboy("uno").send(sendProps);
+    await battleHandler.methods.createCowboy("dos").send(sendProps);
+}
