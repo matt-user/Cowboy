@@ -6,8 +6,8 @@ pragma solidity >=0.7.0 <0.9.0;
 /// @author mattauer@umich.edu
 contract BattleHandler {
     struct Battle {
-        Cowboy cowboy1;
-        Cowboy cowboy2;
+        uint cowboyId1;
+        uint cowboyId2;
         string winner;
         uint turnCounter;
         bool gameOver;
@@ -61,7 +61,7 @@ contract BattleHandler {
     * @param cowboyId2 id of cowboy2
      */
     function createBattle(uint cowboyId1, uint cowboyId2) public {
-        battleList.push(Battle(cowboyList[cowboyId1], cowboyList[cowboyId2], "", 0, false));
+        battleList.push(Battle(cowboyId1, cowboyId2, "", 0, false));
     }
 
     /**
@@ -98,8 +98,8 @@ contract BattleHandler {
     * @param battle the battle whose turn finished
      */
     function finishTurn(Battle storage battle) internal {
-        Cowboy storage cowboy1 = battle.cowboy1;
-        Cowboy storage cowboy2 = battle.cowboy2;
+        Cowboy storage cowboy1 = cowboyList[battle.cowboyId1];
+        Cowboy storage cowboy2 = cowboyList[battle.cowboyId2];
         if (cowboy1.shooting && cowboy2.reloading) {
             // Cowboy 1 wins
             battle.winner = cowboy1.name;
