@@ -29,9 +29,10 @@ describe('Battle Handler', () => {
     it('correctly creates new cowboys', async () => {
         await battleHandler.methods.createCowboy("uno").send(sendProps);
         await battleHandler.methods.createCowboy("dos").send(sendProps);
-        const battle = await battleHandler.methods.getBattle().call();
-        assert.strictEqual(battle.cowboy1.name, "uno", "cowboy1 was not initialzed");
-        assert.strictEqual(battle.cowboy2.name, "dos", "cowboy2 was not initialized");
+        const cowboy0 = await battleHandler.methods.getCowboy(0).call();
+        const cowboy1 = await battleHandler.methods.getCowboy(1).call();
+        cowboyStateHelper(cowboy0, "0", false, false);
+        cowboyStateHelper(cowboy1, "0", false, false);
     });
 
     it('Correctly reloads for the cowboy', async () => {
