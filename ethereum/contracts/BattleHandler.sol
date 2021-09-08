@@ -6,8 +6,8 @@ pragma solidity >=0.7.0 <0.9.0;
 /// @author mattauer@umich.edu
 contract BattleHandler {
     struct Battle {
+        uint cowboyId0;
         uint cowboyId1;
-        uint cowboyId2;
         string winner;
         uint turnCounter;
         bool gameOver;
@@ -73,6 +73,7 @@ contract BattleHandler {
     function takeTurn(uint command, uint cowboyId, uint battleId) public {
         Battle storage battle = battleList[battleId];
         require(!battle.gameOver, "The game is over your cowboy can't take turns.");
+        require(cowboyId == battle.cowboyId0 || cowboyId == battle.cowboyId1, "The given cowboy is not in the given battle");
         Cowboy storage cowboy = cowboyList[cowboyId];
         require(!cowboy.takenTurn, "Cowboy has already taken turn this round");
 
@@ -98,8 +99,8 @@ contract BattleHandler {
     * @param battle the battle whose turn finished
      */
     function finishTurn(Battle storage battle) internal {
-        Cowboy storage cowboy1 = cowboyList[battle.cowboyId1];
-        Cowboy storage cowboy2 = cowboyList[battle.cowboyId2];
+        Cowboy storage cowboy1 = cowboyList[battle.cowboyId0];
+        Cowboy storage cowboy2 = cowboyList[battle.cowboyId1];
         if (cowboy1.shooting && cowboy2.reloading) {
             // Cowboy 1 wins
             battle.winner = cowboy1.name;
