@@ -59,9 +59,10 @@ describe('Battle Handler', () => {
     });
 
     it('Requires cowboy to have a shot before they can shoot', async () => {
+        await createTestBattle();
         // Command cowboy 1 to shoot
         try {
-            await battleHandler.methods.takeTurn(1, 1).send(sendProps);
+            await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
             assert(false);
         } catch (err) {
             assert(err.message);
