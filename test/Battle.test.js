@@ -104,22 +104,24 @@ describe('Battle Handler', () => {
     });
 
     it('Makes sure cowboys dont take extra turns', async () => {
-        // Command cowboy 2 to reload
-        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
-        let battle = await battleHandler.methods.getBattle().call();
-        cowboyStateHelper(battle.cowboy2, "1", false, true)
+        await createTestBattle();
+        // Command cowboy 1 to reload
+        await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
+        const cowboy1 = await battleHandler.methods.getCowboy(1).call();
+        cowboyStateHelper(cowboy1, "1", false, true)
         try {
-            // Command cowboy 2 to shoot and take extra turn
-            await battleHandler.methods.takeTurn(1, 2).send(sendProps);
+            // Command cowboy 1 to shoot and take extra turn
+            await battleHandler.methods.takeTurn(1, 1, 0).send(sendProps);
             assert(false);
         } catch (err) {
-            assert.strictEqual(battle.turnCounter, "1", "battle turn count should be 1");
+            assert(err);
         }
     });
 
     it('Requires the game to be over before a call to getWinner()', async () => {
+        await createTestBattle();
         try {
-            await battleHandler.methods.getWinner().call();
+            await battleHandler.methods.getWinner(0).call();
             assert(false);
         } catch (err) {
             assert(err);
