@@ -81,6 +81,19 @@ describe('Battle Handler', () => {
         assert.strictEqual(winner, "uno", "getWinner should return uno");
     });
 
+    it('Allows cowboys to dodge shots', async () => {
+        // Command cowboy 1 and 2 to reload
+        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
+        // Command cowboy 1 to shoot and 2 to dodge
+        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
+        await battleHandler.methods.takeTurn(2, 2).send(sendProps);
+        let battle = await battleHandler.methods.getBattle().call();
+        assert.strictEqual(battle.gameOver, false, "battle.gameover should be true");
+        assert.strictEqual(battle.winner, "", "battle.winner should be empty");
+        assert.strictEqual(battle.turnCounter, "0", "battle.turnCounter should be 0");
+    });
+
     it('Makes sure cowboys dont take extra turns', async () => {
         // Command cowboy 2 to reload
         await battleHandler.methods.takeTurn(0, 2).send(sendProps);
@@ -92,6 +105,15 @@ describe('Battle Handler', () => {
             assert(false);
         } catch (err) {
             assert.strictEqual(battle.turnCounter, "1", "battle turn count should be 1");
+        }
+    });
+
+    it('Requires the game to be over before a call to getWinner()', async () => {
+        try {
+            await battleHandler.methods.getWinner().call();
+            assert(false);
+        } catch (err) {
+            assert(err);
         }
     });
 });
