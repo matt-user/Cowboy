@@ -35,7 +35,23 @@ describe('Battle Handler', () => {
             from: accounts[0], gas: '3000000'
         });
         const battle = await battleHandler.methods.getBattle().call();
-        reloadCheck(battle.cowboy1, "1");
+        testHelper(battle.cowboy1, "1", false, true);
+    });
+
+    it('Correctly shoots for the cowboy', async() => {
+        // Command cowboy 1 and 2 to reload
+        await battleHandler.methods.takeTurn(0, 1).send({
+            from: accounts[0], gas: '3000000'
+        });
+        await battleHandler.methods.takeTurn(0, 2).send({
+            from: accounts[0], gas: '3000000'
+        });
+        // Command cowboy 1 to shoot
+        await battleHandler.methods.takeTurn(1, 1).send({
+            from: accounts[0], gas: '3000000'
+        });
+        let battle = await battleHandler.methods.getBattle().call();
+        testHelper(battle.cowboy1, '0', true, false);
     });
 
     it('Makes sure cowboys dont take extra turns', async () => {
@@ -44,7 +60,7 @@ describe('Battle Handler', () => {
             from: accounts[0], gas: '3000000'
         });
         let battle = await battleHandler.methods.getBattle().call();
-        reloadCheck(battle.cowboy2, "1")
+        testHelper(battle.cowboy2, "1", false, true)
         try {
             // Command cowboy 2 to shoot and take extra turn
             await battleHandler.methods.takeTurn(1, 2).send({
@@ -57,15 +73,16 @@ describe('Battle Handler', () => {
     });
 });
 
-
-function reloadCheck(cowboy, shotCount) {
+/**
+ * Tests the the cowboy has the correct state
+ * @param {Object} cowboy The cowboy to check state
+ * @param {String} shotCount the number of shots the cowboy has
+ * @param {boolean} shootingShouldBe what cowboy.shooting should be set to
+ * @param {boolean} reloadingShouldBe what cowboy.reloading should be set to
+**/
+function testHelper(cowboy, shotCount, shootingShouldBe, reloadingShouldBe) {
     assert.strictEqual(cowboy.shots, shotCount, "reload did not increment cowboy.shots");
-    assert.strictEqual(cowboy.reloading, true, "cowboy.reloading was not set to true");
-    assert.strictEqual(cowboy.shooting, false, "cowboy.shooting was not set to false");
+    assert.strictEqual(cowboy.reloading, reloadingShouldBe, `cowboy.reloading was not set to ${reloadingShouldBe}`);
+    assert.strictEqual(cowboy.shooting, shootingShouldBe, `cowboy.shooting was not set to ${shootingShouldBe}`);
 }
 
-function shootCheck(cowboy, shotCount) {
-    assert.strictEqual(cowboy.shots, shotCount, "shoot did not decrement cowboy.shots");
-    assert.strictEqual(cowboy.shooting, true, "cowboy.shooting was not set to true");
-    assert.strictEqual(cowboy.reloading, false, "cowboy.reloading was not set to false");
-}
