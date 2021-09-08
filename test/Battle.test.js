@@ -36,7 +36,7 @@ describe('Battle Handler', () => {
         // Command cowboy1 to reload
         await battleHandler.methods.takeTurn(0, 1).send(sendProps);
         const battle = await battleHandler.methods.getBattle().call();
-        testHelper(battle.cowboy1, "1", false, true);
+        cowboyStateHelper(battle.cowboy1, "1", false, true);
     });
 
     it('Correctly shoots for the cowboy', async () => {
@@ -46,7 +46,7 @@ describe('Battle Handler', () => {
         // Command cowboy 1 to shoot
         await battleHandler.methods.takeTurn(1, 1).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
-        testHelper(battle.cowboy1, '0', true, false);
+        cowboyStateHelper(battle.cowboy1, '0', true, false);
     });
 
     it('Requires cowboy to have a shot before they can shoot', async () => {
@@ -63,7 +63,7 @@ describe('Battle Handler', () => {
         // Command cowboy 1 to dodge
         await battleHandler.methods.takeTurn(2, 1).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
-        testHelper(battle.cowboy1, "0", false, false);
+        cowboyStateHelper(battle.cowboy1, "0", false, false);
     });
 
     it('Correctly ends the game', async () => {
@@ -74,9 +74,7 @@ describe('Battle Handler', () => {
         await battleHandler.methods.takeTurn(1, 1).send(sendProps);
         await battleHandler.methods.takeTurn(0, 2).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
-        assert.strictEqual(battle.gameOver, true, "battle.gameover should be true");
-        assert.strictEqual(battle.winner, "uno", "battle.winner should be uno");
-        assert.strictEqual(battle.turnCounter, "0", "battle.turnCounter should be 0");
+        battleStateHelper(battle, true, "uno", "0");
         let winner = await battleHandler.methods.getWinner().call();
         assert.strictEqual(winner, "uno", "getWinner should return uno");
     });
@@ -89,16 +87,14 @@ describe('Battle Handler', () => {
         await battleHandler.methods.takeTurn(1, 1).send(sendProps);
         await battleHandler.methods.takeTurn(2, 2).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
-        assert.strictEqual(battle.gameOver, false, "battle.gameover should be true");
-        assert.strictEqual(battle.winner, "", "battle.winner should be empty");
-        assert.strictEqual(battle.turnCounter, "0", "battle.turnCounter should be 0");
+        battleStateHelper(battle, false, "", "0")
     });
 
     it('Makes sure cowboys dont take extra turns', async () => {
         // Command cowboy 2 to reload
         await battleHandler.methods.takeTurn(0, 2).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
-        testHelper(battle.cowboy2, "1", false, true)
+        cowboyStateHelper(battle.cowboy2, "1", false, true)
         try {
             // Command cowboy 2 to shoot and take extra turn
             await battleHandler.methods.takeTurn(1, 2).send(sendProps);
@@ -125,9 +121,21 @@ describe('Battle Handler', () => {
  * @param {boolean} shootingShouldBe what cowboy.shooting should be set to
  * @param {boolean} reloadingShouldBe what cowboy.reloading should be set to
 **/
-function testHelper(cowboy, shotCount, shootingShouldBe, reloadingShouldBe) {
+function cowboyStateHelper(cowboy, shotCount, shootingShouldBe, reloadingShouldBe) {
     assert.strictEqual(cowboy.shots, shotCount, "reload did not increment cowboy.shots");
     assert.strictEqual(cowboy.reloading, reloadingShouldBe, `cowboy.reloading was not set to ${reloadingShouldBe}`);
     assert.strictEqual(cowboy.shooting, shootingShouldBe, `cowboy.shooting was not set to ${shootingShouldBe}`);
+}
+
+/** Tests the state of the battle
+ * @param {Object} battle the battle to check state
+ * @param {boolean} gameOverShouldBe what gameOver should be
+ * @param {string} winnerShouldBe what the winner should be set to
+ * @param {string} turnCounterShouldBe what the turnCounter should be
+**/
+function battleStateHelper(battle, gameOverShouldBe, winnerShouldBe, turnCounterShouldBe) {
+    assert.strictEqual(battle.gameOver, gameOverShouldBe, `battle.gameover should be ${gameOverShouldBe}`);
+    assert.strictEqual(battle.winner, winnerShouldBe, `battle.winner should be ${winnerShouldBe}`);
+    assert.strictEqual(battle.turnCounter, turnCounterShouldBe, `battle.turnCounter should be ${turnCounterShouldBe}`);
 }
 
