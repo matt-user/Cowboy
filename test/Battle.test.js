@@ -35,19 +35,16 @@ describe('Battle Handler', () => {
     });
 
     it('correctly creates new battles', async () => {
-        // await battleHandler.methods.createCowboy("uno").send(sendProps);
-        // await battleHandler.methods.createCowboy("dos").send(sendProps);
-        // await battleHandler.methods.createBattle(0, 1).send(sendProps);
-        // const battle = await battleHandler.methods.getBattle(0).call();
         const battle = await createTestBattle();
         battleStateHelper(battle, false, "", "0")
     });
 
     it('Correctly reloads for the cowboy', async () => {
+        await createTestBattle();
         // Command cowboy1 to reload
         await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
-        const battle = await battleHandler.methods.getBattle(0).call();
-        cowboyStateHelper(battle.cowboy1, "1", false, true);
+        const cowboy0 = await battleHandler.methods.getCowboy(0).call()
+        cowboyStateHelper(cowboy0, "1", false, true);
     });
 
     it('Correctly shoots for the cowboy', async () => {
