@@ -2,6 +2,8 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+/// @title handles cowboy battling
+/// @author mattauer@umich.edu
 contract BattleHandler {
     struct Battle {
         Cowboy cowboy1;
@@ -21,28 +23,53 @@ contract BattleHandler {
 
     Battle[] private battleList;
     Cowboy[] private cowboyList;
-    //Battle private battle;
 
     constructor() {}
 
+    /**
+    * @dev returns the winning name if the battle is over
+    * @param battleId id of the battle to get the winner
+    * @return returns the name of the winner of the battle
+    **/
     function getWinner(uint battleId) public view returns(string memory) {
         Battle storage battle = battleList[battleId];
         require(battle.gameOver, "There is no winner yet.");
         return battle.winner;
     }
 
+    /**
+    * @dev returns the battle of the give battle id
+    * @param battleId id of the battle to return
+    * @return the battle of the given id
+    **/
     function getBattle(uint battleId) public view returns(Battle memory) {
+        require(battleId < battleList.length, "battle Id out of bounds");
         return battleList[battleId];
     }
 
-    function createNewCowboy(string memory _name) public {
+    /**
+    * @dev creates a new cowboy
+    * @param _name name of the new cowboy
+    **/
+    function createCowboy(string memory _name) public {
         cowboyList.push(Cowboy(_name, 0, false, false, false));
     }
 
+    /**
+    * @dev creates a new battle
+    * @param cowboyId1 id of cowboy1
+    * @param cowboyId2 id of cowboy2
+     */
     function createBattle(uint cowboyId1, uint cowboyId2) public {
         battleList.push(Battle(cowboyList[cowboyId1], cowboyList[cowboyId2], "", 0, false));
     }
 
+    /**
+    * @dev takes turn for a cowboy in a battle
+    * @param command what action the cowboy takes
+    * @param cowboyId specifies which cowboy to command
+    * @param battleId specifies the battle for this turn
+    */
     function takeTurn(uint command, uint cowboyId, uint battleId) public {
         Battle storage battle = battleList[battleId];
         require(!battle.gameOver, "The game is over your cowboy can't take turns.");
@@ -66,6 +93,10 @@ contract BattleHandler {
         }
     }
 
+    /**
+    * @dev finishes the turn for the two battling cowboys
+    * @param battle the battle whose turn finished
+     */
     function finishTurn(Battle storage battle) internal {
         Cowboy storage cowboy1 = battle.cowboy1;
         Cowboy storage cowboy2 = battle.cowboy2;
@@ -84,12 +115,20 @@ contract BattleHandler {
         battle.turnCounter = 0;
     }
 
+    /**
+    * @dev reloads the given cowboy
+    * @param cowboy cowboy to reload
+     */
     function reload(Cowboy storage cowboy) internal {
         cowboy.shots++;
         cowboy.reloading = true;
         cowboy.shooting = false;
     }
 
+    /**
+    * @dev shoots a bullet from the cowboy
+    * @param cowboy who shoots
+     */
     function shoot(Cowboy storage cowboy) internal {
         require(cowboy.shots >= 1, "Your cowboy can't shoot without ammo");
         cowboy.shots--;
@@ -97,6 +136,10 @@ contract BattleHandler {
         cowboy.shooting = true;
     }
 
+    /**
+    * @dev tell cowboy to dodge
+    * @param cowboy who dodges
+     */
     function dodge(Cowboy storage cowboy) internal {
         cowboy.reloading = false;
         cowboy.shooting = false;
