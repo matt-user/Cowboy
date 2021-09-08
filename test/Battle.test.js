@@ -60,7 +60,7 @@ describe('Battle Handler', () => {
 
     it('Requires cowboy to have a shot before they can shoot', async () => {
         await createTestBattle();
-        // Command cowboy 1 to shoot
+        // Command cowboy 0 to shoot
         try {
             await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
             assert(false);
@@ -70,10 +70,11 @@ describe('Battle Handler', () => {
     })
 
     it('Correctly dodges for the cowboy', async () => {
-        // Command cowboy 1 to dodge
-        await battleHandler.methods.takeTurn(2, 1).send(sendProps);
-        let battle = await battleHandler.methods.getBattle().call();
-        cowboyStateHelper(battle.cowboy1, "0", false, false);
+        await createTestBattle();
+        // Command cowboy 0 to dodge
+        await battleHandler.methods.takeTurn(2, 0, 0).send(sendProps);
+        const cowboy0 = await battleHandler.methods.getCowboy(0).call();
+        cowboyStateHelper(cowboy0, "0", false, false);
     });
 
     it('Correctly ends the game', async () => {
