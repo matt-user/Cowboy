@@ -8,14 +8,17 @@ const compiledBattleHandler = require('../ethereum/build/BattleHandler.json');
 
 let accounts;
 let battleHandler;
+let sendProps;
 
 beforeEach(async () => {
     accounts = await web3.eth.getAccounts();
 
+    sendProps = { from: accounts[0], gas: '3000000'};
+
     // Deploy a battle handler
     battleHandler = await new web3.eth.Contract(compiledBattleHandler.abi)
         .deploy({ data: compiledBattleHandler.evm.bytecode.object })
-        .send({ from: accounts[0], gas: '3000000' });
+        .send(sendProps);
 });
 
 describe('Battle Handler', () => {
@@ -31,25 +34,17 @@ describe('Battle Handler', () => {
 
     it('Correctly reloads for the cowboy', async () => {
         // Command cowboy1 to reload
-        await battleHandler.methods.takeTurn(0, 1).send({
-            from: accounts[0], gas: '3000000'
-        });
+        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
         const battle = await battleHandler.methods.getBattle().call();
         testHelper(battle.cowboy1, "1", false, true);
     });
 
     it('Correctly shoots for the cowboy', async () => {
         // Command cowboy 1 and 2 to reload
-        await battleHandler.methods.takeTurn(0, 1).send({
-            from: accounts[0], gas: '3000000'
-        });
-        await battleHandler.methods.takeTurn(0, 2).send({
-            from: accounts[0], gas: '3000000'
-        });
+        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
         // Command cowboy 1 to shoot
-        await battleHandler.methods.takeTurn(1, 1).send({
-            from: accounts[0], gas: '3000000'
-        });
+        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
         testHelper(battle.cowboy1, '0', true, false);
     });
@@ -57,9 +52,7 @@ describe('Battle Handler', () => {
     it('Requires cowboy to have a shot before they can shoot', async () => {
         // Command cowboy 1 to shoot
         try {
-            await battleHandler.methods.takeTurn(1, 1).send({
-                from: accounts[0], gas: '3000000'
-            });
+            await battleHandler.methods.takeTurn(1, 1).send(sendProps);
             assert(false);
         } catch (err) {
             assert(err.message);
@@ -68,29 +61,34 @@ describe('Battle Handler', () => {
 
     it('Correctly dodges for the cowboy', async () => {
         // Command cowboy 1 to dodge
-        await battleHandler.methods.takeTurn(2, 1).send({
-            from: accounts[0], gas: '3000000'
-        });
+        await battleHandler.methods.takeTurn(2, 1).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
         testHelper(battle.cowboy1, "0", false, false);
     });
 
-    // it('Correctly ends the game', async () => {
-    //     // Command cowboy 1 and 2 to reload
-    // });
+    it('Correctly ends the game', async () => {
+        // Command cowboy 1 and 2 to reload
+        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
+        // Command cowboy 1 to shoot and 2 to reload
+        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
+        let battle = await battleHandler.methods.getBattle().call();
+        assert.strictEqual(battle.gameOver, true, "battle.gameover should be true");
+        assert.strictEqual(battle.winner, "uno", "battle.winner should be uno");
+        assert.strictEqual(battle.turnCounter, "0", "battle.turnCounter should be 0");
+        let winner = await battleHandler.methods.getWinner().call();
+        assert.strictEqual(winner, "uno", "getWinner should return uno");
+    });
 
     it('Makes sure cowboys dont take extra turns', async () => {
         // Command cowboy 2 to reload
-        await battleHandler.methods.takeTurn(0, 2).send({
-            from: accounts[0], gas: '3000000'
-        });
+        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
         let battle = await battleHandler.methods.getBattle().call();
         testHelper(battle.cowboy2, "1", false, true)
         try {
             // Command cowboy 2 to shoot and take extra turn
-            await battleHandler.methods.takeTurn(1, 2).send({
-                from: accounts[0], gas: '3000000'
-            });
+            await battleHandler.methods.takeTurn(1, 2).send(sendProps);
             assert(false);
         } catch (err) {
             assert.strictEqual(battle.turnCounter, "1", "battle turn count should be 1");
