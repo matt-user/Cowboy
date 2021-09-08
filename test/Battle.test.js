@@ -26,7 +26,9 @@ describe('Battle Handler', () => {
         assert.ok(battleHandler.options.address, "Battle handler was not deployed correctly");
     });
 
-    it('correctly initialzes data', async () => {
+    it('correctly creates new cowboys', async () => {
+        await battleHandler.methods.createCowboy("uno").send(sendProps);
+        await battleHandler.methods.createCowboy("dos").send(sendProps);
         const battle = await battleHandler.methods.getBattle().call();
         assert.strictEqual(battle.cowboy1.name, "uno", "cowboy1 was not initialzed");
         assert.strictEqual(battle.cowboy2.name, "dos", "cowboy2 was not initialized");

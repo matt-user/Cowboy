@@ -48,6 +48,16 @@ contract BattleHandler {
     }
 
     /**
+    * @dev returns the cowboy of the given id
+    * @param cowboyId id of the cowboy to return
+    * @return the cowboy of the given id
+     */
+     function getCowboy(uint cowboyId) public view returns(Cowboy memory) {
+         require(cowboyId < cowboyList.length, "cowboy id out of bounds");
+         return cowboyList[cowboyId];
+     }
+
+    /**
     * @dev creates a new cowboy
     * @param _name name of the new cowboy
     **/
