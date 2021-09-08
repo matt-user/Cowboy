@@ -21,15 +21,12 @@ contract BattleHandler {
 
     Battle[] private battleList;
     Cowboy[] private cowboyList;
-    Battle private battle;
+    //Battle private battle;
 
-    constructor() {
-        Cowboy memory cowboy1 = Cowboy("uno", 0, false, false, false);
-        Cowboy memory cowboy2 = Cowboy("dos", 0, false, false, false);
-        battle = Battle(cowboy1, cowboy2, "", 0, false);
-    }
+    constructor() {}
 
-    function getWinner() public view returns(string memory) {
+    function getWinner(uint battleId) public view returns(string memory) {
+        Battle storage battle = battleList[battleId];
         require(battle.gameOver, "There is no winner yet.");
         return battle.winner;
     }
@@ -46,14 +43,10 @@ contract BattleHandler {
         battleList.push(Battle(cowboyList[cowboyId1], cowboyList[cowboyId2], "", 0, false));
     }
 
-    function takeTurn(uint command, uint cowboyId) public {
+    function takeTurn(uint command, uint cowboyId, uint battleId) public {
+        Battle storage battle = battleList[battleId];
         require(!battle.gameOver, "The game is over your cowboy can't take turns.");
-        Cowboy storage cowboy;
-        if (cowboyId == 1){
-            cowboy = battle.cowboy1;
-        } else {
-            cowboy = battle.cowboy2;
-        }
+        Cowboy storage cowboy = cowboyList[cowboyId];
         require(!cowboy.takenTurn, "Cowboy has already taken turn this round");
 
         if (command == 0) {
@@ -69,11 +62,13 @@ contract BattleHandler {
         battle.turnCounter++;
         if (battle.turnCounter == 2) {
             // Both cowboys have taken their turn
-            finishTurn(battle.cowboy1, battle.cowboy2);
+            finishTurn(battle);
         }
     }
 
-    function finishTurn(Cowboy storage cowboy1, Cowboy storage cowboy2) internal {
+    function finishTurn(Battle storage battle) internal {
+        Cowboy storage cowboy1 = battle.cowboy1;
+        Cowboy storage cowboy2 = battle.cowboy2;
         if (cowboy1.shooting && cowboy2.reloading) {
             // Cowboy 1 wins
             battle.winner = cowboy1.name;
