@@ -54,7 +54,19 @@ describe('Battle Handler', () => {
         testHelper(battle.cowboy1, '0', true, false);
     });
 
-    it('Correctly dodges for the cowboy', async () =>{
+    it('Requires cowboy to have a shot before they can shoot', async () => {
+        // Command cowboy 1 to shoot
+        try {
+            await battleHandler.methods.takeTurn(1, 1).send({
+                from: accounts[0], gas: '3000000'
+            });
+            assert(false);
+        } catch (err) {
+            assert(err.message);
+        }
+    })
+
+    it('Correctly dodges for the cowboy', async () => {
         // Command cowboy 1 to dodge
         await battleHandler.methods.takeTurn(2, 1).send({
             from: accounts[0], gas: '3000000'
@@ -62,6 +74,10 @@ describe('Battle Handler', () => {
         let battle = await battleHandler.methods.getBattle().call();
         testHelper(battle.cowboy1, "0", false, false);
     });
+
+    // it('Correctly ends the game', async () => {
+    //     // Command cowboy 1 and 2 to reload
+    // });
 
     it('Makes sure cowboys dont take extra turns', async () => {
         // Command cowboy 2 to reload
