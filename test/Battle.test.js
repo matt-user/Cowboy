@@ -41,20 +41,21 @@ describe('Battle Handler', () => {
 
     it('Correctly reloads for the cowboy', async () => {
         await createTestBattle();
-        // Command cowboy1 to reload
+        // Command cowboy 0 to reload
         await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
         const cowboy0 = await battleHandler.methods.getCowboy(0).call()
         cowboyStateHelper(cowboy0, "1", false, true);
     });
 
     it('Correctly shoots for the cowboy', async () => {
-        // Command cowboy 1 and 2 to reload
-        await battleHandler.methods.takeTurn(0, 1).send(sendProps);
-        await battleHandler.methods.takeTurn(0, 2).send(sendProps);
-        // Command cowboy 1 to shoot
-        await battleHandler.methods.takeTurn(1, 1).send(sendProps);
-        let battle = await battleHandler.methods.getBattle().call();
-        cowboyStateHelper(battle.cowboy1, '0', true, false);
+        await createTestBattle();
+        // Command cowboy 0 and 1 to reload
+        await battleHandler.methods.takeTurn(0, 0, 0).send(sendProps);
+        await battleHandler.methods.takeTurn(0, 1, 0).send(sendProps);
+        // Command cowboy 0 to shoot
+        await battleHandler.methods.takeTurn(1, 0, 0).send(sendProps);
+        const cowboy0 = await battleHandler.methods.getCowboy(0).call();
+        cowboyStateHelper(cowboy0, '0', true, false);
     });
 
     it('Requires cowboy to have a shot before they can shoot', async () => {
