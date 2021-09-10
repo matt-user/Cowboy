@@ -67,7 +67,7 @@ describe('Battle Handler', () => {
         } catch (err) {
             assert(err.message);
         }
-    })
+    });
 
     it('Correctly dodges for the cowboy', async () => {
         await createTestBattle();
