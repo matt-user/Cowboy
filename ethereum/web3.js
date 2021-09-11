@@ -1,3 +1,4 @@
+// Uses browser info to detect which provider we pass to our instance of web3
 import Web3 from 'web3';
 
 let web3;
