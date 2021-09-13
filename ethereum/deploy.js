@@ -1,5 +1,5 @@
 // Deploys our contracts to the rinkeby test network
-const HDWalletProvider = require('truffle-hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 const Web3 = require('web3');
 const compiledBattleHandler = require('./build/BattleHandler.json');
 require('dotenv').config();
@@ -10,7 +10,7 @@ const web3 = new Web3(provider);
 
 const deploy = async () => {
     const accounts = await web3.eth.getAccounts();
-    console.log(`Attempting t odeploy from account ${accounts[0]}`);
+    console.log(`Attempting to deploy from account ${accounts[0]}`);
     const result = await new web3.eth.Contract(compiledBattleHandler.abi)
         .deploy({ data: compiledBattleHandler.evm.bytecode.object })
         .send({ gas: '3000000', from: accounts[0], gasPrice: '5000000000'});
