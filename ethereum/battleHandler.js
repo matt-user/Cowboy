@@ -2,5 +2,5 @@
 import web3 from './web3';
 import compiledBattleHandler from './build/BattleHandler.json';
 
-const instace = new web3.eth.Contract(compiledBattleHandler.abi, "0xe429A7c7bBabC4606b5d4d80eC643A3532F92bDA");
+const instace = new web3.eth.Contract(compiledBattleHandler.abi, "0x2505abF02FD3e1CeA36930cbc6846cdB7cb74E82");
 export default instance;
