@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "compile": "node ethereum/compile.js"
+    "compile": "node ethereum/compile.js",
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "link": "next lint"
   },
   "author": "mattauer@umich.edu",
   "license": "ISC",
