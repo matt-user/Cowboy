@@ -39,7 +39,7 @@ contract BattleHandler {
     * @param battleId id of the battle to get the winner
     * @return returns the name of the winner of the battle
     **/
-    function getWinner(uint battleId) public view returns(string memory) {
+    function getWinner(uint battleId) external view returns (string memory) {
         Battle storage battle = battleList[battleId];
         require(battle.gameOver, "There is no winner yet.");
         return battle.winner;
@@ -50,18 +50,34 @@ contract BattleHandler {
     * @param battleId id of the battle to return
     * @return the battle of the given id
     **/
-    function getBattle(uint battleId) public idInBounds(battleId, battleList.length) view returns(Battle memory) {
+    function getBattle(uint battleId) external idInBounds(battleId, battleList.length) view returns (Battle memory) {
         return battleList[battleId];
     }
+
+    /**
+    * @dev returns all of the battles
+    * @return a list of all of the battles
+     */
+     function getAllBattles() external view returns (Battle[] memory) {
+         return battleList;
+     }
 
     /**
     * @dev returns the cowboy of the given id
     * @param cowboyId id of the cowboy to return
     * @return the cowboy of the given id
      */
-     function getCowboy(uint cowboyId) public idInBounds(cowboyId, cowboyList.length) view returns(Cowboy memory) {
+     function getCowboy(uint cowboyId) external idInBounds(cowboyId, cowboyList.length) view returns (Cowboy memory) {
          return cowboyList[cowboyId];
      }
+
+     /**
+     * @dev returns all of the cowboys
+     * @return a list of all of the cowboys
+      */
+    function getAllCowboys() external view returns (Cowboy[] memory) {
+        return cowboyList;
+    }
 
     /**
     * @dev creates a new cowboy
